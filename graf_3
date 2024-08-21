@@ -1,0 +1,44 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import re
+
+# Função para remover números de uma string
+def remover_numeros(texto):
+    return re.sub(r'\d+', '', texto)
+
+# Ler o arquivo CSV
+dados = pd.read_csv('/content/Dengue_SINAN - casos.csv')
+
+# Remover números da coluna "Div.adm.estadual de notific"
+dados['Div.adm.estadual de notific'] = dados['Div.adm.estadual de notific'].apply(remover_numeros)
+
+# Ordenar os valores da coluna "Total" em ordem crescente
+dados = dados.sort_values(by='Total')
+
+# Descartar o maior valor
+dados = dados.iloc[:-1]
+
+# Plotar gráfico de barras
+plt.figure(figsize=(12, 8))
+bars = plt.bar(dados['Div.adm.estadual de notific'], dados['Total'], color='royalblue')
+
+# Tamanho da fonte dos valores
+tamanho_fonte = 10  # Ajuste o tamanho da fonte aqui
+
+# Adicionar valores no topo das barras
+for bar in bars:
+    height = bar.get_height()
+    plt.text(bar.get_x() + bar.get_width() / 2, height + (max(dados['Total']) * 0.01),
+             str(height), ha='center', va='bottom', fontsize=tamanho_fonte)
+
+# Adicionar título e rótulos dos eixos
+plt.title('Valores totais de casos em ordem crescente')
+plt.xlabel('Div.adm.estadual de notific')
+plt.ylabel('Total')
+plt.xticks(rotation=90)
+
+# Remover a grade
+plt.grid(False)
+
+plt.tight_layout()
+plt.show()
